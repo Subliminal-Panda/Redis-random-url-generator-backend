@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 flask = "*"
 flask-redis = "*"
+flask-cors = "*"
+flask-heroku = "*"
+cors = "*"
 
 [dev-packages]
 
