@@ -32,6 +32,11 @@ def get_key(key):
     grabbed_key = redis_client.get(key)
     return jsonify(grabbed_key.decode('utf-8'))
 
+@app.route('/url/delete/<key>', methods=["DELETE"])
+def delete_key(key):
+    key_to_delete = redis_client.delete(key)
+    return jsonify("key has been deleted.")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
