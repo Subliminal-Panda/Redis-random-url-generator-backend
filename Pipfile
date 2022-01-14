@@ -10,6 +10,9 @@ flask-cors = "*"
 flask-heroku = "*"
 cors = "*"
 gunicorn = "*"
+flask-sqlalchemy = "*"
+flask-marshmallow = "*"
+psycopg2 = "*"
 
 [dev-packages]
 

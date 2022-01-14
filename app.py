@@ -1,37 +1,60 @@
 ﻿from flask import Flask, request, jsonify
-from flask_redis import FlaskRedis
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 from flask_heroku import Heroku
-
 import psycopg2
+import os
+
 import random
 import string
-import os
-import redis
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["REDIS_URL"] = "redis://:pa41016516313b339841974e534113c236901d14f89502d066b45ceadb159897f@ec2-34-237-62-177.compute-1.amazonaws.com:18899"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://tyiqnhngopukqe:870e05ace212a1cfaaa9e73057d5729f4a9c237e80b77e24ead707a6cbbe78ef@ec2-54-167-152-185.compute-1.amazonaws.com:5432/de30ecaso2mj79"
+db = SQLAlchemy(app)
+ma = Marshmallow(app)
 CORS(app)
-redis_client = FlaskRedis(app)
-url = urlparse(os.environ.get("REDIS_URL"))
-r = redis.Redis(host=url.hostname, port=url.port, username=url.username, password=url.password, ssl=True, ssl_cert_reqs=None)
+
+class Url(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String, unique=False, nullable=False)
+    key = db.Column(db.String, nullable=True)
+
+
+
+    def __init__(self, id, url, key):
+        self.id = id
+        self.url = url
+        self.key = key
+
+class UrlSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'url', 'key')
+
+url_schema = UrlSchema()
+multiple_url_schema = UrlSchema(many=True)
 
 
 @app.route('/url/add', methods=["POST"])
 def add_url():
     if request.content_type != 'application/json':
-        return jsonify('Error: Data must be sent as JSON.')
+        return jsonify('Error: Data must be Formatted as JSON.')
 
-    url = request.json.get('url')
-    custom_link = request.json.get('custom link')
+    post_data = request.get_json()
+    url = post_data.get('url')
+    custom_link = post_data.get('custom link')
     if custom_link == None:
         key = "".join([random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10)])
     else:
         key = custom_link
 
-    redis_client.set(key, url)
-    return jsonify(key)
+    new_url = Url(id, url, key)
+
+    db.session.add(new_url)
+    db.session.commit()
+    successful = ["New URL added to database:", url_schema.dump(new_url)]
+    return jsonify(successful)
 
 @app.route('/url/get', methods=["GET"])
 def get_all_keys():
