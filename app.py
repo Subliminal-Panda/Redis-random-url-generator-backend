@@ -6,12 +6,14 @@ from flask_heroku import Heroku
 import random
 import string
 import os
+from urllib.parse import urlparse
 import redis
 
 app = Flask(__name__)
 CORS(app)
 redis_client = FlaskRedis(app)
-r = redis.from_url(os.environ.get("REDIS_URL"))
+url = urlparse(os.environ.get("REDIS_URL"))
+r = redis.Redis(host=url.hostname, port=url.port, username=url.username, password=url.password, ssl=True, ssl_cert_reqs=None)
 
 
 @app.route('/url/add', methods=["POST"])
