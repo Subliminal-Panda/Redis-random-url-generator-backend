@@ -13,6 +13,7 @@ gunicorn = "*"
 flask-sqlalchemy = "*"
 flask-marshmallow = "*"
 psycopg2 = "*"
+redis = "*"
 
 [dev-packages]
 
