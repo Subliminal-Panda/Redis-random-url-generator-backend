@@ -9,6 +9,7 @@ flask-redis = "*"
 flask-cors = "*"
 flask-heroku = "*"
 cors = "*"
+gunicorn = "*"
 
 [dev-packages]
 

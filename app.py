@@ -5,10 +5,13 @@ from flask_heroku import Heroku
 
 import random
 import string
+import os
+import redis
 
 app = Flask(__name__)
 CORS(app)
 redis_client = FlaskRedis(app)
+r = redis.from_url(os.environ.get("REDIS_URL"))
 
 
 @app.route('/url/add', methods=["POST"])
@@ -17,7 +20,11 @@ def add_url():
         return jsonify('Error: Data must be sent as JSON.')
 
     url = request.json.get('url')
-    key = "".join([random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(20)])
+    custom_link = request.json.get('custom link')
+    if custom_link == None:
+        key = "".join([random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10)])
+    else:
+        key = custom_link
 
     redis_client.set(key, url)
     return jsonify(key)
