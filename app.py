@@ -3,13 +3,15 @@ from flask_redis import FlaskRedis
 from flask_cors import CORS
 from flask_heroku import Heroku
 
+import psycopg2
 import random
 import string
 import os
-from urllib.parse import urlparse
 import redis
 
 app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["REDIS_URL"] = "redis://:pa41016516313b339841974e534113c236901d14f89502d066b45ceadb159897f@ec2-34-237-62-177.compute-1.amazonaws.com:18899"
 CORS(app)
 redis_client = FlaskRedis(app)
 url = urlparse(os.environ.get("REDIS_URL"))
